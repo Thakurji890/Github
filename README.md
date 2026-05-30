@@ -1,3 +1,9 @@
+# Git Clone and setup
+## Clone
+
+git clone <repository-url>
+
+
 ## Console Commands
 
     For reading console command we use
