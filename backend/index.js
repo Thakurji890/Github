@@ -41,7 +41,7 @@ yargs(hideBin(process.argv))
     },
   )
   .command("push", "push Commit to repo", {}, pushRepo)
-  .command("pull", "pull commit from repo", {}, pullRepo)
+  .command("pull", "pull Commit from repo",{}, pullRepo)
   .command(
     "revert <commitID>",
     "Revert to specific commit",
