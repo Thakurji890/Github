@@ -1,6 +1,12 @@
 require("dotenv").config();
 
-const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
+const {
+  S3Client,
+  PutObjectCommand,
+  ListBucketsCommand,
+  ListObjectsV2Command,
+  GetObjectCommand,
+} = require("@aws-sdk/client-s3");
 
 const s3 = new S3Client({
   region: process.env.REGION,
@@ -15,4 +21,7 @@ module.exports = {
   s3,
   S3_BUCKET,
   PutObjectCommand,
+  ListBucketsCommand,
+  ListObjectsV2Command,
+  GetObjectCommand,
 };
