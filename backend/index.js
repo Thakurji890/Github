@@ -55,5 +55,5 @@ yargs(hideBin(process.argv))
       revertRepo(argv.commitID);
     },
   )
-  .demandCommand(1, "You have give atleast one command")
+  .demandCommand(1, "You have to give atleast one command")
   .help().argv;
