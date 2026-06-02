@@ -14,6 +14,7 @@ const { commitRepo } = require("./controllers/commit");
 const { pullRepo } = require("./controllers/pull");
 const { pushRepo } = require("./controllers/push");
 const { revertRepo } = require("./controllers/revert");
+const { error } = require("console");
 
 yargs(hideBin(process.argv))
   .command("start", "start a new server", {}, startServer)
@@ -65,5 +66,24 @@ yargs(hideBin(process.argv))
   .help().argv;
 
 function startServer() {
-  console.log("Server Logic called!");
+  const app = express();
+  const port = process.env.PORT || 5500;
+
+  app.use(bodyParser.json());
+  app.use(express.json());
+
+  const mongoURI = process.env.MONGO_URI;
+
+  mongoose
+    .connect(mongoURI)
+    .then(() => {
+      console.log(`Database Connected Successfully ✅🚀`);
+    })
+    .catch((error) => {
+      console.error(`Unable to Connect With Database Due to ${error}`);
+    });
+
+  app.listen(port, () => {
+    console.log(`Server is Running on PORT : ${port}`);
+  });
 }
