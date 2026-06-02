@@ -1,9 +1,16 @@
 require("dotenv").config();
+
+const dns = require("dns");
+dns.setServers(["8.8.8.8", "8.8.4.4"]);
+
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const http = require("http");
+
+// socket creation
+const { Server } = require("socket.io");
 
 const yargs = require("yargs");
 const { hideBin } = require("yargs/helpers");
@@ -14,7 +21,6 @@ const { commitRepo } = require("./controllers/commit");
 const { pullRepo } = require("./controllers/pull");
 const { pushRepo } = require("./controllers/push");
 const { revertRepo } = require("./controllers/revert");
-const { error } = require("console");
 
 yargs(hideBin(process.argv))
   .command("start", "start a new server", {}, startServer)
@@ -71,19 +77,51 @@ function startServer() {
 
   app.use(bodyParser.json());
   app.use(express.json());
+  // cors use
+  app.use(cors({ origin: "*" }));
 
   const mongoURI = process.env.MONGO_URI;
 
   mongoose
     .connect(mongoURI)
     .then(() => {
-      console.log(`Database Connected Successfully ✅🚀`);
+      console.log(`Database Connected Successfully ✅ 🚀`);
     })
     .catch((error) => {
       console.error(`Unable to Connect With Database Due to ${error}`);
     });
 
-  app.listen(port, () => {
+  app.get("/", (req, res) => {
+    res.json({ Status: "Good" });
+  });
+
+  let user = "aniket";
+  // server creation
+  const httpServer = http.createServer(app);
+  const io = new Server(httpServer, {
+    cors: {
+      origin: "*",
+      methods: ["GET", "POST"],
+    },
+  });
+
+  io.on("connection", (socket) => {
+    socket.on("joinRoom", (userID) => {
+      user = userID;
+      console.log("======");
+      console.log(user);
+      console.log("======");
+      socket.join(userID);
+    });
+  });
+
+  const db = mongoose.connection;
+  db.once("open", async () => {
+    console.log("CRUD Operation is Called");
+    // CRUD Operation
+  });
+
+  httpServer.listen(port, () => {
     console.log(`Server is Running on PORT : ${port}`);
   });
 }
