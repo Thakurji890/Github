@@ -12,6 +12,9 @@ const http = require("http");
 // socket creation
 const { Server } = require("socket.io");
 
+// Router requiring
+const mainRouter = require("./routes/main.router");
+
 const yargs = require("yargs");
 const { hideBin } = require("yargs/helpers");
 
@@ -91,9 +94,8 @@ function startServer() {
       console.error(`Unable to Connect With Database Due to ${error}`);
     });
 
-  app.get("/", (req, res) => {
-    res.json({ Status: "Good" });
-  });
+  // routering
+  app.use("/", mainRouter);
 
   let user = "aniket";
   // server creation
