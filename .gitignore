@@ -1,4 +1,4 @@
 node_modules
 .env
 .fileGit
-# commit.json
+commit.json
