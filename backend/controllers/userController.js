@@ -47,7 +47,7 @@ const signup = async (req, res) => {
     const token = jwt.sign(
       { id: result.insertedId },
       process.env.JWT_SECRET_KEY,
-      { expiresIn: "7d" },
+      { expiresIn: "120h" },
     );
 
     res.json({ token });
@@ -57,8 +57,33 @@ const signup = async (req, res) => {
   }
 };
 
-const login = (req, res) => {
-  res.send("Login user!");
+const login = async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    await connectClient();
+    const db = client.db(process.env.DB_NAME);
+
+    const usersCollection = db.collection("users");
+
+    const user = await usersCollection.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: "Invalid Credential!" });
+    }
+
+    const isMatched = await bcrypt.compare(password, user.password);
+    if (!isMatched) {
+      return res.status(400).json({ message: "Invalid Credential!" });
+    }
+
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET_KEY, {
+      expiresIn: "120h",
+    });
+
+    res.json({ token, userId: user._id });
+  } catch (error) {
+    console.error(`Connection Failed Due to ${error.message}`);
+    res.status(500).send("Server Error");
+  }
 };
 
 const getAllUsers = (req, res) => {
