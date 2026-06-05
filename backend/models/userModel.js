@@ -21,7 +21,7 @@ const UserSchema = new Schema({
   repositories: [
     {
       default: [],
-      tyepe: Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "Repository",
     },
   ],
@@ -29,19 +29,20 @@ const UserSchema = new Schema({
   follewedUsers: [
     {
       default: [],
-      tyepe: Schema.Types.ObjectId,
-      ref: "Users",
+      type: Schema.Types.ObjectId,
+      ref: "User",
     },
   ],
 
   starRepos: [
     {
       default: [],
-      tyepe: Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "Repository",
     },
   ],
 });
 
-const User = mongoose.model("Users", UserSchema);
-export default User;
+const User = mongoose.model("User", UserSchema);
+
+module.exports = User;
