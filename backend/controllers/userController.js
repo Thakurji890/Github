@@ -6,6 +6,9 @@ require("dotenv").config();
 const uri = process.env.MONGO_URI;
 const client = new MongoClient(uri);
 
+// for Object id from mongoose
+let ObjectId = require("mongodb").ObjectId;
+
 async function connectClient() {
   if (!client) {
     client = new MongoClient(uri, {
@@ -86,19 +89,45 @@ const login = async (req, res) => {
   }
 };
 
-const getAllUsers = (req, res) => {
-  res.send("All user fetched");
+const getAllUsers = async (req, res) => {
+  try {
+    // connection establishing
+    await connectClient();
+    const db = client.db(process.env.DB_NAME);
+    const usersCollection = db.collection("users");
+
+    const users = await usersCollection.find({}).toArray();
+    res.json(users);
+  } catch (error) {
+    console.error(`Connection Failed Due to ${error.message}`);
+    res.status(500).send("Server Error");
+  }
 };
 
-const getUserProfile = (req, res) => {
-  res.send("Profile Fetched");
+const getUserProfile = async (req, res) => {
+  const currId = req.params.id;
+  try {
+    await connectClient();
+    const db = client.db(process.env.DB_NAME);
+    const usersCollection = db.collection("users");
+
+    const user = await usersCollection.findOne({ _id: new ObjectId(currId) });
+    if (!user) {
+      return res.status(400).json({ message: "User Not Found!" });
+    }
+
+    res.send(user);
+  } catch (error) {
+    console.error(`Connection Failed Due to ${error.message}`);
+    res.status(500).send("Server Error");
+  }
 };
 
-const updateUserProfile = (req, res) => {
+const updateUserProfile = async (req, res) => {
   res.send("Profile updated");
 };
 
-const deleteUserProfile = (req, res) => {
+const deleteUserProfile = async (req, res) => {
   res.send("Profile Deleted!");
 };
 
