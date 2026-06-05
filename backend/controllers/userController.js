@@ -124,11 +124,61 @@ const getUserProfile = async (req, res) => {
 };
 
 const updateUserProfile = async (req, res) => {
-  res.send("Profile updated");
+  const currId = req.params.id;
+  const { email, password } = req.body;
+  try {
+    await connectClient();
+    const db = client.db(process.env.DB_NAME);
+    const usersCollection = db.collection("users");
+
+    let updatedFields = { email };
+    if (password) {
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
+      updatedFields.password = hashedPassword;
+    }
+
+    const result = await usersCollection.findOneAndUpdate(
+      {
+        _id: new ObjectId(currId),
+      },
+      { $set: updatedFields },
+      { returnDocument: "after" },
+    );
+
+    if (!result.value) {
+      return res.status(404).json({ message: "User Not Found!" });
+    }
+
+    res.send(result.value);
+  } catch (error) {
+    console.error(
+      `Unable to Update the latest changes due to ${error.message}`,
+    );
+    res.status(500).send("Server Error");
+  }
 };
 
 const deleteUserProfile = async (req, res) => {
-  res.send("Profile Deleted!");
+  const currId = req.params.id;
+  try {
+    await connectClient();
+    const db = client.db(process.env.DB_NAME);
+    const usersCollection = db.collection("users");
+
+    const result = await usersCollection.deleteOne({
+      _id: new ObjectId(currId),
+    });
+
+    if (result.deletedCount == 0) {
+      return res.status(404).json({ message: "User Not Found!" });
+    }
+
+    res.json({ message: "User Profile Deleted!" });
+  } catch (error) {
+    console.error(`Unable to Delete the Profile due to ${error.message}`);
+    res.status(500).send("Server Error");
+  }
 };
 
 module.exports = {
