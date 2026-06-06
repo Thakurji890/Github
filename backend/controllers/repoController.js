@@ -6,18 +6,18 @@ const User = require("../models/userModel");
 const Issue = require("../models/issueModel");
 
 const creatRepository = async (req, res) => {
-  const { userId, name, issues, content, description, visiblity } = req.body;
+  const { owner, name, issues, content, description, visiblity } = req.body;
 
   try {
     if (!name) {
       return res.status(400).json({ error: "Repository Name is Required!" });
     }
 
-    // if (!userId) {
-    //   return res.status(400).json({ error: "User Id is Required!" });
-    // }
+    if (!owner) {
+      return res.status(400).json({ error: "Owner Id is Required!" });
+    }
 
-    if (!mongoose.Types.ObjectId.isValid(userId)) {
+    if (!mongoose.Types.ObjectId.isValid(owner)) {
       return res.status(400).json({ error: "Invalid User ID!" });
     }
 
@@ -25,7 +25,7 @@ const creatRepository = async (req, res) => {
       name,
       description,
       visiblity,
-      owner: userId,
+      owner,
       content,
       issues,
     });
@@ -53,10 +53,36 @@ const getAllRepository = async (req, res) => {
   }
 };
 
-const fetchRepositoryById = async (req, res) => {};
+const fetchRepositoryById = async (req, res) => {
+  const { id: repoId } = req.params;
+  try {
+    const repository = await Repository.find({ _id: repoId })
+      .populate("owner")
+      .populate("issues");
+    if (!repository) {
+      return res.status(404).json({ message: "Repository Not Found!" });
+    }
+    res.json(repository);
+  } catch (error) {
+    console.error(`Uable to fetching Repository due to ${error}`);
+    res.status(500).send("Server Error");
+  }
+};
 
 const fetchRepositoryByName = async (req, res) => {
-  res.send("All repository Details fetched");
+  const { name: repoName } = req.params;
+  try {
+    const repository = await Repository.find({ name: repoName })
+      .populate("owner")
+      .populate("issues");
+    if (!repository) {
+      return res.status(404).json({ message: "Repository Not Found!" });
+    }
+    res.json(repository);
+  } catch (error) {
+    console.error(`Uable to fetching Repository due to ${error}`);
+    res.status(500).send("Server Error");
+  }
 };
 
 const fectchRepositoryForCurrentUser = async (req, res) => {
