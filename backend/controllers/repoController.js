@@ -86,19 +86,77 @@ const fetchRepositoryByName = async (req, res) => {
 };
 
 const fectchRepositoryForCurrentUser = async (req, res) => {
-  res.send("repositories for logged in user fectched");
+  const userId = req.user;
+  try {
+    const repositories = await Repository.find({ owner: userId });
+
+    if (!repositories || repositories.length == 0) {
+      return res.status(404).json({ error: "User Repository Not Found!" });
+    }
+    res.json({ message: "Repositories Found!", repositories });
+  } catch (error) {
+    console.error(`Uable to fetching Repository due to ${error}`);
+    res.status(500).send("Server Error");
+  }
 };
 
 const updateRepositoryById = async (req, res) => {
-  res.send("Repository Updated");
+  const { id } = req.params;
+  const { content, description } = req.body;
+
+  try {
+    const repository = await Repository.findById(id);
+    if (!repository) {
+      return res.status(404).json({ error: "User Repository Not Found!" });
+    }
+
+    repository.content.push(content);
+    repository.description = description;
+    const updatedRepository = await repository.save();
+
+    res.json({
+      message: "Repository Updated Successfully!",
+      repository: updatedRepository,
+    });
+  } catch (error) {
+    console.error(`Uable to Updating Repository due to ${error}`);
+    res.status(500).send("Server Error");
+  }
 };
 
 const toggleVisibilityById = async (req, res) => {
-  res.send("Visibility Toggled!");
+  const { id } = req.params;
+
+  try {
+    const repository = await Repository.findById(id);
+    if (!repository) {
+      return res.status(404).json({ error: "User Repository Not Found!" });
+    }
+
+    repository.visibility = !repository.visibility;
+    const updatedRepository = await repository.save();
+    res.json({
+      message: "Repository Visibility toggled Successfully!",
+      repository: updatedRepository,
+    });
+  } catch (error) {
+    console.error(`Uable to Change Visibility due to ${error}`);
+    res.status(500).send("Server Error");
+  }
 };
 
 const deleteRepositoryById = async (req, res) => {
-  res.send("Repository Deleted!");
+  const { id } = req.params;
+  try {
+    const repository = await Repository.findByIdAndDelete(id);
+    if (!repository) {
+      return res.status(404).json({ error: "User Repository Not Found!" });
+    }
+    res.json({ message: "Repository Deleted Successfully!" });
+  } catch (error) {
+    console.error(`Uable to Delete Repository due to ${error}`);
+    res.status(500).send("Server Error");
+  }
 };
 
 module.exports = {
