@@ -53,7 +53,7 @@ const signup = async (req, res) => {
       { expiresIn: "120h" },
     );
 
-    res.json({ token });
+    res.json({ token, userId: result.insertedId });
   } catch (error) {
     console.error(`Connection Failed Due to ${error.message}`);
     res.status(500).send("Server Error");
