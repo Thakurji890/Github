@@ -6,7 +6,7 @@ const User = require("../models/userModel");
 const Issue = require("../models/issueModel");
 
 const creatRepository = async (req, res) => {
-  const { owner, name, issues, content, description, visiblity } = req.body;
+  const { owner, name, issues, content, description, visibility } = req.body;
 
   try {
     if (!name) {
@@ -24,13 +24,16 @@ const creatRepository = async (req, res) => {
     const newRepository = new Repository({
       name,
       description,
-      visiblity,
+      visibility,
       owner,
       content,
       issues,
     });
 
     const result = await newRepository.save();
+
+    // Link the new repository back to the owner's repositories array
+    await User.findByIdAndUpdate(owner, { $push: { repositories: result._id } });
 
     res
       .status(201)

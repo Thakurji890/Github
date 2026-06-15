@@ -4,17 +4,14 @@ const { MongoClient } = require("mongodb");
 require("dotenv").config();
 
 const uri = process.env.MONGO_URI;
-const client = new MongoClient(uri);
+let client = null;
 
 // for Object id from mongoose
 let ObjectId = require("mongodb").ObjectId;
 
 async function connectClient() {
   if (!client) {
-    client = new MongoClient(uri, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    client = new MongoClient(uri);
     await client.connect();
   }
 }
