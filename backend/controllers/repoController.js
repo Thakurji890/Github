@@ -89,16 +89,19 @@ const fetchRepositoryByName = async (req, res) => {
 };
 
 const fectchRepositoryForCurrentUser = async (req, res) => {
-  const userId = req.user;
+  const userId = req.params.userID; // read from route param: /repo/user/:userID
   try {
-    const repositories = await Repository.find({ owner: userId });
+    if (!userId) {
+      return res.status(400).json({ error: "User ID is required!" });
+    }
+    const repositories = await Repository.find({ owner: userId }).populate("owner").populate("issues");
 
-    if (!repositories || repositories.length == 0) {
+    if (!repositories || repositories.length === 0) {
       return res.status(404).json({ error: "User Repository Not Found!" });
     }
     res.json({ message: "Repositories Found!", repositories });
   } catch (error) {
-    console.error(`Uable to fetching Repository due to ${error}`);
+    console.error(`Unable to fetch Repository due to ${error}`);
     res.status(500).send("Server Error");
   }
 };
