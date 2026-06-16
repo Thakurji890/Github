@@ -42,7 +42,7 @@ const darkTheme = createTheme({
 });
 
 const Signup = () => {
-  const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { currUser, setCurrUser } = useAuth();
@@ -54,10 +54,10 @@ const Signup = () => {
 
     try {
       setLoading(true);
-      const res = await axios.post("http://localhost:5500/signup/", {
+      const res = await axios.post("http://localhost:5500/signup", {
         email: email,
         password: password,
-        name: name,
+        username: username,
       });
 
       localStorage.setItem("token", res.data.token);
@@ -106,16 +106,16 @@ const Signup = () => {
               <Grid container spacing={2}>
                 <Grid item xs={12}>
                   <TextField
-                    autoComplete="name"
-                    name="name"
+                    autoComplete="username"
+                    name="username"
                     required
                     fullWidth
-                    id="name"
-                    label="Full Name"
+                    id="username"
+                    label="Username"
                     autoFocus
                     size="small"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
                   />
                 </Grid>
                 <Grid item xs={12}>
