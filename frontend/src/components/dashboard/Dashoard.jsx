@@ -1,9 +1,8 @@
-import React, { useEffect, useId, useState } from "react";
-import axios from "axios";
+import React, { useEffect, useState } from "react";
 
 const Dashoard = () => {
   const [repositories, setRepositories] = useState([]);
-  const [searchQuery, setSearchQuery] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const [suggestedRepositories, setSuggestedRepositories] = useState([]);
   const [searchResult, setSearchResult] = useState([]);
 
@@ -23,7 +22,7 @@ const Dashoard = () => {
     const fetchSuggestedRepositories = async () => {
       try {
         const res = await fetch(`http://localhost:5500/repo/all`);
-        const data = res.json();
+        const data = await res.json();
         setSuggestedRepositories(data);
       } catch (error) {
         console.error(`${error} while fectching Repositories `);
