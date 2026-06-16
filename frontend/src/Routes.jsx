@@ -1,11 +1,12 @@
 import React, { useEffect } from "react";
 import { useNavigate, useRoutes } from "react-router-dom";
 
-// pages list
+// pages
 import Dashboard from "./components/dashboard/Dashoard";
 import Profile from "./components/user/Profile";
 import Login from "./components/auth/Login";
 import Signup from "./components/auth/Signup";
+import RepoPage from "./components/repo/RepoPage";
 
 // Auth context
 import { useAuth } from "./authContext";
@@ -31,22 +32,11 @@ const ProjectRoutes = () => {
   }, [currUser, navigate]);
 
   let element = useRoutes([
-    {
-      path: "/",
-      element: <Dashboard />,
-    },
-    {
-      path: "/auth",
-      element: <Login />,
-    },
-    {
-      path: "/signup",
-      element: <Signup />,
-    },
-    {
-      path: "/profile",
-      element: <Profile />,
-    },
+    { path: "/",          element: <Dashboard /> },
+    { path: "/auth",      element: <Login /> },
+    { path: "/signup",    element: <Signup /> },
+    { path: "/profile",   element: <Profile /> },
+    { path: "/repo/:id",  element: <RepoPage /> },
   ]);
 
   return element;

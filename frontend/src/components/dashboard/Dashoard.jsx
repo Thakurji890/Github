@@ -1,15 +1,8 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
-  Box,
-  Typography,
-  Avatar,
-  Button,
-  TextField,
-  InputAdornment,
-  Divider,
-  Chip,
-  IconButton,
-  Tooltip,
+  Box, Typography, Avatar, Button, TextField,
+  InputAdornment, Divider, Chip, IconButton, Tooltip,
 } from "@mui/material";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -26,6 +19,8 @@ import BugReportIcon from "@mui/icons-material/BugReport";
 import FolderOpenIcon from "@mui/icons-material/FolderOpen";
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import { repoAPI, userAPI } from "../../api/api";
+import CreateRepo from "../repo/CreateRepo";
 
 /* ─── GitHub Dark Theme ─────────────────────────────────────── */
 const theme = createTheme({
@@ -253,53 +248,59 @@ const ExploreCard = ({ repo }) => (
   </Box>
 );
 
-/* ─── Main Dashboard ─────────────────────────────────────────── */
 const Dashoard = () => {
+  const navigate = useNavigate();
   const [repositories, setRepositories] = useState([]);
   const [suggestedRepositories, setSuggestedRepositories] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResult, setSearchResult] = useState([]);
+  const [user, setUser] = useState(null);
+  const [createRepoOpen, setCreateRepoOpen] = useState(false);
+
+  const userId = localStorage.getItem("userId");
 
   useEffect(() => {
-    const userId = localStorage.getItem("userId");
+    const fetchProfile = async () => {
+      if (!userId) return;
+      try {
+        const res = await userAPI.getProfile(userId);
+        setUser(res.data);
+      } catch (err) { console.error("Profile fetch error:", err); }
+    };
 
     const fetchRepositories = async () => {
+      if (!userId) return;
       try {
-        const res = await fetch(`http://localhost:5500/repo/user/${userId}`);
-        const data = await res.json();
-        setRepositories(data.repositories || []);
-      } catch (err) {
-        console.error(`${err} while fetching user repositories`);
-      }
+        const res = await repoAPI.getByUser(userId);
+        setRepositories(res.data.repositories || []);
+      } catch (err) { console.error("Repo fetch error:", err); }
     };
 
     const fetchSuggestedRepositories = async () => {
       try {
-        const res = await fetch(`http://localhost:5500/repo/all`);
-        const data = await res.json();
-        setSuggestedRepositories(data || []);
-      } catch (error) {
-        console.error(`${error} while fetching all repositories`);
-      }
+        const res = await repoAPI.getAll();
+        setSuggestedRepositories(res.data || []);
+      } catch (error) { console.error("Suggested repos error:", error); }
     };
 
+    fetchProfile();
     fetchRepositories();
     fetchSuggestedRepositories();
-  }, []);
+  }, [userId]);
 
   useEffect(() => {
-    if (searchQuery === "") {
-      setSearchResult(repositories);
-    } else {
-      setSearchResult(
-        repositories.filter((repo) =>
-          repo.name.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-      );
-    }
+    if (searchQuery === "") setSearchResult(repositories);
+    else setSearchResult(repositories.filter((r) => r.name.toLowerCase().includes(searchQuery.toLowerCase())));
   }, [searchQuery, repositories]);
 
   const displayRepos = searchResult.length > 0 ? searchResult : repositories;
+
+  const handleRepoCreated = () => {
+    // Refetch repos after creation
+    if (!userId) return;
+    repoAPI.getByUser(userId).then((res) => setRepositories(res.data.repositories || []));
+    repoAPI.getAll().then((res) => setSuggestedRepositories(res.data || []));
+  };
 
   return (
     <ThemeProvider theme={theme}>
@@ -361,10 +362,11 @@ const Dashoard = () => {
               <NotificationsNoneIcon fontSize="small" />
             </IconButton>
           </Tooltip>
-          <Tooltip title="Create new">
+          <Tooltip title="Create new repository">
             <Button
               size="small"
               endIcon={<KeyboardArrowDownIcon fontSize="small" />}
+              onClick={() => setCreateRepoOpen(true)}
               sx={{
                 color: "#e6edf3",
                 border: "1px solid #30363d",
@@ -376,19 +378,19 @@ const Dashoard = () => {
               <AddIcon fontSize="small" />
             </Button>
           </Tooltip>
-          <Avatar
-            sx={{
-              width: 28,
-              height: 28,
-              bgcolor: "#238636",
-              fontSize: 13,
-              cursor: "pointer",
-              border: "2px solid #30363d",
-              "&:hover": { borderColor: "#58a6ff" },
-            }}
-          >
-            U
-          </Avatar>
+          <Tooltip title="View profile">
+            <Avatar
+              onClick={() => navigate("/profile")}
+              sx={{
+                width: 28, height: 28, bgcolor: "#238636",
+                fontSize: 13, cursor: "pointer",
+                border: "2px solid #30363d",
+                "&:hover": { borderColor: "#58a6ff" },
+              }}
+            >
+              {(user?.username || "U")[0].toUpperCase()}
+            </Avatar>
+          </Tooltip>
         </Box>
       </Box>
 
@@ -412,21 +414,16 @@ const Dashoard = () => {
           {/* User Card */}
           <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 2.5 }}>
             <Avatar
-              sx={{
-                width: 40,
-                height: 40,
-                bgcolor: "#238636",
-                fontSize: 17,
-                border: "2px solid #30363d",
-              }}
+              onClick={() => navigate("/profile")}
+              sx={{ width: 40, height: 40, bgcolor: "#238636", fontSize: 17, border: "2px solid #30363d", cursor: "pointer", "&:hover": { borderColor: "#58a6ff" } }}
             >
-              U
+              {(user?.username || "U")[0].toUpperCase()}
             </Avatar>
             <Box>
-              <Typography sx={{ color: "#e6edf3", fontWeight: 600, fontSize: 14 }}>
-                User
+              <Typography sx={{ color: "#e6edf3", fontWeight: 600, fontSize: 14, cursor: "pointer", "&:hover": { color: "#58a6ff" } }} onClick={() => navigate("/profile")}>
+                {user?.username || "User"}
               </Typography>
-              <Typography sx={{ color: "#8b949e", fontSize: 12 }}>@user</Typography>
+              <Typography sx={{ color: "#8b949e", fontSize: 12 }}>@{user?.username?.toLowerCase() || "user"}</Typography>
             </Box>
           </Box>
 
@@ -443,8 +440,8 @@ const Dashoard = () => {
           >
             {[
               { label: "Repos", value: repositories.length, icon: <BookIcon sx={{ fontSize: 14 }} /> },
-              { label: "Following", value: 0, icon: <PeopleAltOutlinedIcon sx={{ fontSize: 14 }} /> },
-              { label: "Stars", value: 0, icon: <StarBorderIcon sx={{ fontSize: 14 }} /> },
+              { label: "Following", value: user?.follewedUsers?.length ?? 0, icon: <PeopleAltOutlinedIcon sx={{ fontSize: 14 }} /> },
+              { label: "Stars", value: user?.starRepos?.length ?? 0, icon: <StarBorderIcon sx={{ fontSize: 14 }} /> },
             ].map((stat, i) => (
               <Box
                 key={stat.label}
@@ -558,6 +555,7 @@ const Dashoard = () => {
                 variant="contained"
                 size="small"
                 startIcon={<AddIcon />}
+                onClick={() => setCreateRepoOpen(true)}
                 sx={{ bgcolor: "#238636", "&:hover": { bgcolor: "#2ea043" } }}
               >
                 Create a repository
@@ -636,6 +634,13 @@ const Dashoard = () => {
           </Box>
         </Box>
       </Box>
+
+      {/* Create Repo Modal */}
+      <CreateRepo
+        open={createRepoOpen}
+        onClose={() => setCreateRepoOpen(false)}
+        onCreated={handleRepoCreated}
+      />
     </ThemeProvider>
   );
 };
