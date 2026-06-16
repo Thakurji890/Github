@@ -28,7 +28,7 @@ const ProjectRoutes = () => {
     if (userIdFromStorage && ["/auth", "/signup"].includes(window.location.pathname)) {
       navigate("/");
     }
-  }, [currUser, navigate, setCurrUser]);
+  }, [currUser, navigate]);
 
   let element = useRoutes([
     {
