@@ -17,6 +17,7 @@ import StarBorderIcon from "@mui/icons-material/StarBorder";
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 import { userAPI } from "../../api/api";
 import { useAuth } from "../../authContext";
+import ContributionHeatmap from "./ContributionHeatmap";
 
 const darkTheme = createTheme({
   palette: {
@@ -137,7 +138,8 @@ const Profile = () => {
         </Button>
       </Box>
 
-      <Box sx={{ maxWidth: 900, mx: "auto", px: { xs: 2, md: 4 }, pt: 4, pb: 6, display: "grid", gridTemplateColumns: { xs: "1fr", md: "240px 1fr" }, gap: 4 }}>
+      <Box sx={{ maxWidth: 900, mx: "auto", px: { xs: 2, md: 4 }, pt: 4, pb: 6 }}>
+        <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "240px 1fr" }, gap: 4 }}>
 
         {/* Left — User Card */}
         <Box>
@@ -276,6 +278,8 @@ const Profile = () => {
           </Box>
         </Box>
       </Box>
+      <ContributionHeatmap username={user?.username} />
+    </Box>
     </ThemeProvider>
   );
 };
