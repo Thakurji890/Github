@@ -1,18 +1,17 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Box, Typography, Avatar, Button, Divider, TextField,
-  CircularProgress, Chip, IconButton, Tooltip,
+  CircularProgress, IconButton, Tooltip,
 } from "@mui/material";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import BookIcon from "@mui/icons-material/Book";
-import LockIcon from "@mui/icons-material/Lock";
 import EditIcon from "@mui/icons-material/Edit";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutlined";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
@@ -47,6 +46,12 @@ const darkTheme = createTheme({
 const Profile = () => {
   const navigate = useNavigate();
   const { setCurrUser } = useAuth() || { setCurrUser: () => {} };
+
+  const handleSignOut = () => {
+    localStorage.clear();
+    setCurrUser(null);
+    navigate("/auth");
+  };
 
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -120,11 +125,15 @@ const Profile = () => {
       <CssBaseline />
 
       {/* Navbar */}
-      <Box sx={{ bgcolor: "#161b22", borderBottom: "1px solid #30363d", px: 4, py: 1, display: "flex", alignItems: "center", gap: 2, position: "sticky", top: 0, zIndex: 100 }}>
-        <GitHubIcon sx={{ fontSize: 28, color: "#e6edf3" }} />
+      <Box sx={{ bgcolor: "#161b22", borderBottom: "1px solid #30363d", px: 4, py: 1, display: "flex", alignItems: "center", position: "sticky", top: 0, zIndex: 100 }}>
+        <GitHubIcon sx={{ fontSize: 28, color: "#e6edf3", mr: 2 }} />
         <Button size="small" startIcon={<ArrowBackIcon />} onClick={() => navigate("/")}
           sx={{ color: "#8b949e", "&:hover": { color: "#58a6ff" } }}>
           Dashboard
+        </Button>
+        <Button size="small" onClick={handleSignOut}
+          sx={{ ml: "auto", color: "#8b949e", "&:hover": { color: "#f85149" } }}>
+          Sign out
         </Button>
       </Box>
 

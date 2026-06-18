@@ -1,4 +1,5 @@
-import React, { createContext, useState, useEffect, useContext } from "react";
+/* eslint-disable react-refresh/only-export-components */
+import { createContext, useState, useContext } from "react";
 
 // Creating Context
 const AuthContext = createContext();
@@ -10,13 +11,8 @@ export const useAuth = () => {
 
 // if the user logedd in or not
 export const AuthProvider = ({ children }) => {
-  const [currUser, setCurrUser] = useState(null);
-  useEffect(() => {
-    const userId = localStorage.getItem("userId");
-    if (userId) {
-      setCurrUser(userId);
-    }
-  }, []);
+  const [currUser, setCurrUser] = useState(() => localStorage.getItem("userId"));
+
   const value = {
     currUser,
     setCurrUser,

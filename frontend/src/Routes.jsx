@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useNavigate, useRoutes } from "react-router-dom";
 
 // pages
@@ -29,7 +29,7 @@ const ProjectRoutes = () => {
     if (userIdFromStorage && ["/auth", "/signup"].includes(window.location.pathname)) {
       navigate("/");
     }
-  }, [currUser, navigate]);
+  }, [currUser, navigate, setCurrUser]);
 
   let element = useRoutes([
     { path: "/",          element: <Dashboard /> },

@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Box, Typography, Avatar, Button, TextField,
   InputAdornment, Divider, Chip, IconButton, Tooltip,
+  Menu, MenuItem,
 } from "@mui/material";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -21,6 +22,7 @@ import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { repoAPI, userAPI } from "../../api/api";
 import CreateRepo from "../repo/CreateRepo";
+import { useAuth } from "../../authContext";
 
 /* ─── GitHub Dark Theme ─────────────────────────────────────── */
 const theme = createTheme({
@@ -253,9 +255,20 @@ const Dashoard = () => {
   const [repositories, setRepositories] = useState([]);
   const [suggestedRepositories, setSuggestedRepositories] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchResult, setSearchResult] = useState([]);
   const [user, setUser] = useState(null);
   const [createRepoOpen, setCreateRepoOpen] = useState(false);
+
+  const [anchorEl, setAnchorEl] = useState(null);
+  const handleMenuOpen = (e) => setAnchorEl(e.currentTarget);
+  const handleMenuClose = () => setAnchorEl(null);
+
+  const { setCurrUser } = useAuth() || { setCurrUser: () => {} };
+  const handleSignOut = () => {
+    handleMenuClose();
+    localStorage.clear();
+    setCurrUser(null);
+    navigate("/auth");
+  };
 
   const userId = localStorage.getItem("userId");
 
@@ -288,12 +301,9 @@ const Dashoard = () => {
     fetchSuggestedRepositories();
   }, [userId]);
 
-  useEffect(() => {
-    if (searchQuery === "") setSearchResult(repositories);
-    else setSearchResult(repositories.filter((r) => r.name.toLowerCase().includes(searchQuery.toLowerCase())));
-  }, [searchQuery, repositories]);
-
-  const displayRepos = searchResult.length > 0 ? searchResult : repositories;
+  const displayRepos = searchQuery === ""
+    ? repositories
+    : repositories.filter((r) => r.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
   const handleRepoCreated = () => {
     // Refetch repos after creation
@@ -378,19 +388,37 @@ const Dashoard = () => {
               <AddIcon fontSize="small" />
             </Button>
           </Tooltip>
-          <Tooltip title="View profile">
-            <Avatar
-              onClick={() => navigate("/profile")}
-              sx={{
-                width: 28, height: 28, bgcolor: "#238636",
-                fontSize: 13, cursor: "pointer",
-                border: "2px solid #30363d",
-                "&:hover": { borderColor: "#58a6ff" },
-              }}
-            >
-              {(user?.username || "U")[0].toUpperCase()}
-            </Avatar>
+          <Tooltip title="User menu">
+            <IconButton onClick={handleMenuOpen} size="small" sx={{ p: 0 }}>
+              <Avatar
+                sx={{
+                  width: 28, height: 28, bgcolor: "#238636",
+                  fontSize: 13,
+                  border: "2px solid #30363d",
+                  "&:hover": { borderColor: "#58a6ff" },
+                }}
+              >
+                {(user?.username || "U")[0].toUpperCase()}
+              </Avatar>
+            </IconButton>
           </Tooltip>
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleMenuClose}
+            disableScrollLock
+            sx={{
+              "& .MuiPaper-root": {
+                bgcolor: "#161b22",
+                border: "1px solid #30363d",
+                color: "#e6edf3",
+                mt: 1,
+              }
+            }}
+          >
+            <MenuItem onClick={() => { handleMenuClose(); navigate("/profile"); }} sx={{ fontSize: 13 }}>Your profile</MenuItem>
+            <MenuItem onClick={handleSignOut} sx={{ fontSize: 13, color: "#f85149" }}>Sign out</MenuItem>
+          </Menu>
         </Box>
       </Box>
 

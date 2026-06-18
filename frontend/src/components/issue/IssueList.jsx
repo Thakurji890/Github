@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
   Box, Typography, Button, Chip, TextField, IconButton,
-  CircularProgress, Divider, Tooltip,
+  CircularProgress, Tooltip,
 } from "@mui/material";
 import BugReportIcon from "@mui/icons-material/BugReport";
 import AddIcon from "@mui/icons-material/Add";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutlined";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutlined";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import CloseIcon from "@mui/icons-material/Close";
 import { issueAPI } from "../../api/api";
@@ -21,7 +21,7 @@ const IssueList = ({ repoId, onIssueChange }) => {
   const [filterStatus, setFilterStatus] = useState("open");
   const [error, setError] = useState("");
 
-  const fetchIssues = async () => {
+  const fetchIssues = useCallback(async () => {
     setLoading(true);
     try {
       const res = await issueAPI.getAll();
@@ -36,11 +36,21 @@ const IssueList = ({ repoId, onIssueChange }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [repoId, onIssueChange]);
 
   useEffect(() => {
-    if (repoId) fetchIssues();
-  }, [repoId]);
+    if (repoId) {
+      const controller = { aborted: false };
+      Promise.resolve().then(() => {
+        if (!controller.aborted) {
+          fetchIssues();
+        }
+      });
+      return () => {
+        controller.aborted = true;
+      };
+    }
+  }, [repoId, fetchIssues]);
 
   const handleCreate = async () => {
     if (!title.trim()) { setError("Title is required."); return; }

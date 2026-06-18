@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   Box, Typography, Button, Chip, Divider, TextField,
@@ -9,15 +9,14 @@ import CssBaseline from "@mui/material/CssBaseline";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import BookIcon from "@mui/icons-material/Book";
 import LockIcon from "@mui/icons-material/Lock";
-import BugReportIcon from "@mui/icons-material/BugReport";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutlined";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import EditIcon from "@mui/icons-material/Edit";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
-import { repoAPI, issueAPI } from "../../api/api";
+import { repoAPI } from "../../api/api";
 import IssueList from "../issue/IssueList";
 
 const darkTheme = createTheme({

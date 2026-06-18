@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
-  Box, Button, TextField, Typography, Switch,
-  FormControlLabel, CircularProgress, IconButton,
+  Box, Button, TextField, Typography, CircularProgress, IconButton,
   Backdrop, Fade, Modal, Divider,
 } from "@mui/material";
 import { ThemeProvider, createTheme } from "@mui/material/styles";

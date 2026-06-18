@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../../authContext";
 import {
   Avatar,
@@ -6,7 +6,6 @@ import {
   CssBaseline,
   TextField,
   Link,
-  Grid,
   Box,
   Typography,
   Container,
@@ -43,8 +42,7 @@ const darkTheme = createTheme({
 });
 
 const Login = () => {
-  const { currUser, setCurrUser } = useAuth() || {
-    currUser: null,
+  const { setCurrUser } = useAuth() || {
     setCurrUser: () => {},
   };
 
@@ -54,7 +52,7 @@ const Login = () => {
     if (setCurrUser) {
       setCurrUser(null);
     }
-  }, []);
+  }, [setCurrUser]);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import axios from "axios";
 import {
   Avatar,
@@ -45,7 +45,7 @@ const Signup = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { currUser, setCurrUser } = useAuth();
+  const { setCurrUser } = useAuth();
 
   const [loading, setLoading] = useState(false);
 
