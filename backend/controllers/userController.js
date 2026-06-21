@@ -143,11 +143,11 @@ const updateUserProfile = async (req, res) => {
       { returnDocument: "after" },
     );
 
-    if (!result.value) {
+    if (!result) {
       return res.status(404).json({ message: "User Not Found!" });
     }
 
-    res.send(result.value);
+    res.send(result);
   } catch (error) {
     console.error(
       `Unable to Update the latest changes due to ${error.message}`,

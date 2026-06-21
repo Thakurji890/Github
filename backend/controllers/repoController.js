@@ -116,7 +116,13 @@ const updateRepositoryById = async (req, res) => {
       return res.status(404).json({ error: "User Repository Not Found!" });
     }
 
-    repository.content.push(content);
+    if (content !== undefined) {
+      if (Array.isArray(content)) {
+        repository.content = content;
+      } else {
+        repository.content.push(content);
+      }
+    }
     repository.description = description;
     const updatedRepository = await repository.save();
 
