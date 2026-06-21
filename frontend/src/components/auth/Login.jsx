@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import GitHubIcon from "@mui/icons-material/GitHub";
-import axios from "axios";
+import { userAPI } from "../../api/api";
 
 const darkTheme = createTheme({
   palette: {
@@ -63,7 +63,7 @@ const Login = () => {
     try {
       setLoading(true);
 
-      const res = await axios.post("http://localhost:5500/login", {
+      const res = await userAPI.login({
         email: email,
         password: password,
       });

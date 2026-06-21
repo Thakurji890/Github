@@ -1,5 +1,4 @@
 import { useState } from "react";
-import axios from "axios";
 import {
   Avatar,
   Button,
@@ -15,6 +14,7 @@ import {
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import { useAuth } from "../../authContext";
+import { userAPI } from "../../api/api";
 
 const darkTheme = createTheme({
   palette: {
@@ -54,7 +54,7 @@ const Signup = () => {
 
     try {
       setLoading(true);
-      const res = await axios.post("http://localhost:5500/signup", {
+      const res = await userAPI.signup({
         email: email,
         password: password,
         username: username,
