@@ -4,11 +4,12 @@ const User = require("../models/userModel");
 const Issue = require("../models/issueModel");
 
 const createIssue = async (req, res) => {
-  const { title, description } = req.body;
+  const { title, description, repository } = req.body;
   const { id } = req.params;
 
   try {
-    const issue = new Issue({ title, description, repository: id });
+    const repositoryId = repository || id;
+    const issue = new Issue({ title, description, repository: repositoryId });
     await issue.save();
 
     res.status(201).json(issue);
@@ -34,7 +35,7 @@ const updateIssueById = async (req, res) => {
 
     await issue.save();
 
-    res.json({ message: "Issue Updated!" }, issue);
+    res.json({ message: "Issue Updated!", issue });
   } catch (error) {
     console.error(`Unable to Update Issue Due to ${error}`);
     res.status(500).send("Server Error");
@@ -57,10 +58,8 @@ const deleteIssueById = async (req, res) => {
 };
 
 const getAllIssues = async (req, res) => {
-  const { id } = req.params;
-
   try {
-    const issues = await Issue.find({ repository: id });
+    const issues = await Issue.find({});
 
     if (!issues) {
       return res.status(404).json({ message: "Issue Not Found!" });
